@@ -6,7 +6,7 @@
 #'
 #' @noRd
 #'
-#' @importFrom leaflet leafletOutput
+#' @importFrom leaflet addPolygons leafletOutput
 #' @importFrom shiny absolutePanel actionButton br icon NS tagList
 #' @importFrom shinyWidgets pickerInput
 mod_map_ui <- function(id) {
@@ -37,6 +37,23 @@ mod_map_ui <- function(id) {
         label = "Select element:",
         choices = ELEMENT_NAMES,
         selected = ELEMENT_NAMES$bird[[1]],
+        options = list(
+          `live-search` = TRUE
+          # style = "border-color: #999999;"
+          # style = paste0(
+          #   "background-color: white; ",
+          #   "border-color: #999999; ",
+          #   "font-family: 'Helvetica Neue' Helvetica; ",
+          #   "font-weight: 200;"
+          # )
+        )
+      ),
+
+      shinyWidgets::pickerInput(
+        inputId = ns("map_region"),
+        label = "Select region:",
+        choices = REGION_NAMES,
+        selected = ELEMENT_NAMES[["landscape"]][[2]], ## biomass
         options = list(
           `live-search` = TRUE
           # style = "border-color: #999999;"
@@ -88,24 +105,13 @@ mod_map_server <- function(id, elements) {
     # the modal.
     # Start by setting some defaults that will appear the first time the modal
     # is launched
-    current_selections <- shiny::reactiveValues(
-      region = REGIONS[[1]],
-      palette = "spectral",
-      opacity = 0.8
-    )
+    current_selections <- shiny::reactiveValues(palette = "spectral", opacity = 0.3)
 
     ## Modal ----
     # Create modal to hold all input widgets / filters
     shiny::observeEvent(input$edit_map_settings, {
       modal <- shiny::modalDialog(
         title = "Set Map Preferences",
-
-        selectInput(
-          inputId = ns("map_region"),
-          label = "Region:",
-          choices = REGION_NAMES,
-          selected = current_selections$region
-        ),
 
         selectInput(
           inputId = ns("map_palette"),
@@ -149,7 +155,6 @@ mod_map_server <- function(id, elements) {
     # When the "Apply" button is clicked in the modal, capture the inputs to
     # apply when the modal is re-launched
     shiny::observeEvent(input$close_modal, {
-      current_selections$region <- input$map_region
       current_selections$palette <- input$map_palette
       current_selections$opacity <- input$map_opacity
 
@@ -191,6 +196,7 @@ mod_map_server <- function(id, elements) {
         #   opacity = current_selections$opacity,
         #   max = legend_max
         # ) |>
+        leaflet::addPolygons(data = REGIONS[[1]], color = ~"darkblue", layerId = ~ID) |>
         leaflet::addMeasure(position = "topleft") |>
         htmlwidgets::onRender(
           "
@@ -200,6 +206,22 @@ mod_map_server <- function(id, elements) {
             })
           }
         "
+        )
+    })
+
+    observeEvent(input$map_shape_click, {
+      # Update the select input with the clicked polygon's ID
+      updateSelectInput(session, "map_region", selected = input$map_shape_click$id)
+    })
+
+    observeEvent(input$map_region, {
+      region_id <- stringr::str_extract(input$map_region, "(?<=\\[).*(?=\\])")
+      leaflet::leafletProxy("map") |>
+        leaflet::clearShapes() |>
+        leaflet::addPolygons(
+          data = REGIONS[[1]],
+          color = ~ ifelse(ID == region_id, "red", "darkblue"),
+          layerId = ~ paste0(NAME, " [", ID, "]")
         )
     })
   })

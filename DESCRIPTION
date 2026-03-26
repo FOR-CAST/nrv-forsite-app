@@ -1,6 +1,6 @@
 Package: nrv.forsite.app
 Title: Shiny App For Exploring FORSITE NRV Simulation Outputs
-Version: 0.0.0.9001
+Version: 0.0.0.9002
 Authors@R: c(
     person(
       given = "Alex M.",

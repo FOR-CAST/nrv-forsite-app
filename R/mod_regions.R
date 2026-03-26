@@ -68,18 +68,12 @@ mod_regions_ui <- function(id) {
       column(
         width = 8,
 
+        ## TODO: tab panel for each NRV indicator group plot
         tabsetPanel(
-          #   tabPanel(
-          #     title = "Chart",
-          #
-          #     echarts4r::echarts4rOutput(outputId = ns("regions_trend_chart"), height = "375px")
-          #   ),
-          #
-          #   tabPanel(
-          #     title = "Table",
-          #
-          #     reactable::reactableOutput(outputId = ns("regions_stats_tbl"), height = "375px")
-          #   )
+          tabPanel("Indicator 1", uiOutput(ns("regions_indicator_1_png"))),
+          tabPanel("Indicator 2", uiOutput(ns("regions_indicator_2_png"))),
+          tabPanel("Indicator 3", uiOutput(ns("regions_indicator_3_png"))),
+          tabPanel("Indicator 4", uiOutput(ns("regions_indicator_4_png")))
         )
       )
     )
@@ -92,16 +86,6 @@ mod_regions_ui <- function(id) {
 mod_regions_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
-
-    # Capture the current data based upon the user's selections from the
-    # "Element" and "Region" widgets
-    # regions_data <- reactive({
-    #   df <- get_stats(element = input$regions_element, region = input$regions_region)
-    #
-    #   df$Mean <- round(df$Mean, 4) # for formatting in table & chart tooltip
-    #
-    #   df
-    # })
 
     # Update the options under "Element Name" based upon the selection in the
     # "Element Type" list
@@ -117,47 +101,94 @@ mod_regions_server <- function(id) {
       )
     })
 
-    # Render the map visual
+    # Render the inset map visual
     output$regions_map <- renderPlot({
       req(input$regions_region)
 
       map_region(region = input$regions_region)
     })
 
-    # Render the interactive chart
-    # output$regions_trend_chart <- echarts4r::renderEcharts4r({
-    #   req(regions_data())
-    #
-    #   plot_trend(data = regions_data())
-    # })
+    # Get the path to each png file based on the selected region input
+    ## TODO: populate with actual data
+    NRV_INDICATOR_PNG <- data.frame(
+      TYPE = "ecoprovinces",
+      ID = REGIONS$ecoprovinces$ID,
+      NAME = REGIONS$ecoprovinces$NAME
+    ) |>
+      dplyr::cross_join(data.frame(
+        INDICATOR_NAME = c(
+          "burnSummaries_cumul_burn_hst",
+          "burnSummaries_cumul_burn_sim",
+          "NRV_summary_lm",
+          "NRV_summary_pm"
+        ),
+        INDICATOR_PNG = c(
+          "placeholder1.png",
+          "placeholder2.png",
+          "placeholder3.png",
+          "placeholder4.png"
+        )
+      ))
 
-    # Render the interactive data table
-    # output$regions_stats_tbl <- reactable::renderReactable({
-    #   req(regions_data())
-    #
-    #   regions_data() |>
-    #     reactable::reactable(
-    #       # Specify overall table "default" settings
-    #       rownames = FALSE,
-    #       resizable = TRUE,
-    #       bordered = TRUE,
-    #       defaultColDef = reactable::colDef(minWidth = 75),
-    #       defaultPageSize = 50,
-    #       # Specify individual column settings
-    #       columns = list(
-    #         Index = reactable::colDef(show = FALSE),
-    #         Element = reactable::colDef(name = "Species Name", show = FALSE),
-    #         Year = reactable::colDef(minWidth = 35),
-    #         Region = reactable::colDef(show = FALSE),
-    #         Mean = reactable::colDef(minWidth = 35)
-    #       )
-    #     )
-    # })
+    ## TODO: rename these to match actual indicator names
+    indicator_1_png <- reactive({
+      req(input$regions_region)
+
+      region_id <- stringr::str_extract(input$regions_region, "(?<=\\[).*(?=\\])")
+      row <- dplyr::filter(
+        NRV_INDICATOR_PNG,
+        ID == region_id,
+        INDICATOR_NAME == "burnSummaries_cumul_burn_hst"
+      )
+      # file.path("outputs", row$ID, "1991-2020", "NRV", row$INDICATOR_NAME, row$INDICATOR_PNG)
+      file.path("img", row$INDICATOR_PNG)
+    })
+
+    output$regions_indicator_1_png <- renderUI({
+      img(src = indicator_1_png(), width = "100%", height = "auto")
+    })
+
+    indicator_2_png <- reactive({
+      req(input$regions_region)
+
+      region_id <- stringr::str_extract(input$regions_region, "(?<=\\[).*(?=\\])")
+      row <- dplyr::filter(
+        NRV_INDICATOR_PNG,
+        ID == region_id,
+        INDICATOR_NAME == "burnSummaries_cumul_burn_sim"
+      )
+      # file.path("outputs", row$ID, "1991-2020", "NRV", row$INDICATOR_NAME, row$INDICATOR_PNG)
+      file.path("img", row$INDICATOR_PNG)
+    })
+
+    output$regions_indicator_2_png <- renderUI({
+      img(src = indicator_2_png(), width = "100%", height = "auto")
+    })
+
+    indicator_3_png <- reactive({
+      req(input$regions_region)
+
+      region_id <- stringr::str_extract(input$regions_region, "(?<=\\[).*(?=\\])")
+      row <- dplyr::filter(NRV_INDICATOR_PNG, ID == region_id, INDICATOR_NAME == "NRV_summary_lm")
+      # file.path("outputs", row$ID, "1991-2020", "NRV", row$INDICATOR_NAME, row$INDICATOR_PNG)
+      file.path("img", row$INDICATOR_PNG)
+    })
+
+    output$regions_indicator_3_png <- renderUI({
+      img(src = indicator_3_png(), width = "100%", height = "auto")
+    })
+
+    indicator_4_png <- reactive({
+      req(input$regions_region)
+
+      region_id <- stringr::str_extract(input$regions_region, "(?<=\\[).*(?=\\])")
+      row <- dplyr::filter(NRV_INDICATOR_PNG, ID == region_id, INDICATOR_NAME == "NRV_summary_pm")
+      # file.path("outputs", row$ID, "1991-2020", "NRV", row$INDICATOR_NAME, row$INDICATOR_PNG)
+      file.path("img", row$INDICATOR_PNG)
+    })
+
+    output$regions_indicator_4_png <- renderUI({
+      img(src = indicator_4_png(), width = "100%", height = "auto")
+    })
   })
 }
-
-## To be copied in the UI
-# mod_regions_ui("regions_ui_1")
-
-## To be copied in the server
-# mod_regions_server("regions_ui_1")

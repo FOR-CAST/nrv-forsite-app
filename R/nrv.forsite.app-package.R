@@ -1,3 +1,9 @@
+utils::globalVariables(c(
+  "CANPROVS", "ELEMENT_NAMES", "ELEMENTS", "ID", "INDICATOR_NAME",
+  "REGION_NAMES", "REGIONS", "SCENARIOS", "STATS", "STATUS", "STATUS_MARGINAL",
+  "STATUS_OUTSIDE", "STATUS_WITHIN", "VALUE"
+))
+
 #' @keywords internal
 "_PACKAGE"
 
@@ -37,8 +43,11 @@ NULL
 #' @importFrom leaflet renderLeaflet
 #' @importFrom leaflet setView
 #' @importFrom leaflet tileOptions
+#' @importFrom purrr map_df
 #' @importFrom shinyWidgets pickerInput
 #' @importFrom stringr str_extract
+#' @importFrom tidyr pivot_longer
+#' @importFrom viridis viridis_pal
 #' @importFrom waffle waffle
 ## usethis namespace: end
 NULL

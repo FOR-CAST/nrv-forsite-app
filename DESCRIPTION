@@ -1,36 +1,19 @@
 Package: nrv.forsite.app
 Title: Shiny App For Exploring FORSITE NRV Simulation Outputs
-Version: 0.0.0.9002
+Version: 0.0.1
 Authors@R: c(
-    person(
-      given = "Alex M.",
-      family = "Chubaty",
-      role = c("aut", "cre"),
-      email = "achubaty@for-cast.ca"
-    ),
-    person(
-      given = "Peter",
-      family = "Solymos",
-      role = c("aut"),
-      email = "peter@analythium.io"
-    ), 
-    person(
-      given = "Michael",
-      family = "Thomas",
-      role = c("ctb"),
-      email = "mthomas@ketchbrookanalytics.com"
-    ), 
-    person(
-      given = "Brad",
-      family = "Lindblad",
-      role = c("ctb"),
-      email = "blindblad@ketchbrookanalytics.com"
-    )
+    person("Alex M.", "Chubaty", , "achubaty@for-cast.ca", role = c("aut", "cre")),
+    person("Peter", "Solymos", , "peter@analythium.io", role = "aut"),
+    person("Michael", "Thomas", , "mthomas@ketchbrookanalytics.com", role = "ctb"),
+    person("Brad", "Lindblad", , "blindblad@ketchbrookanalytics.com", role = "ctb")
   )
 Description: Build and deploy FORSITE NRV shiny app.
 License: GPL (>= 2)
+URL: https://github.com/FOR-CAST/nrv-forsite-app
+BugReports: https://github.com/FOR-CAST/nrv-forsite-app/issues
+Depends: 
+    R (>= 4.2)
 Imports: 
-    attempt,
     bsicons,
     bslib,
     config,
@@ -40,32 +23,29 @@ Imports:
     glue,
     golem,
     grDevices,
-    htmltools,
     htmlwidgets,
     leafem,
     leaflet,
     leaflet.extras2,
-    reactable,
-    scales,
+    purrr,
     shiny,
+    shinyWidgets,
     stringr,
+    tidyr,
+    viridis,
     waffle
-Remotes:
-    FOR-CAST/nrvtools@development,
-    hrbrmstr/waffle
-Encoding: UTF-8
-LazyData: true
-LazyDataCompression: gzip
-Language: en-CA
-RoxygenNote: 7.3.3
-URL: https://github.com/FOR-CAST/nrv-forsite-app
-BugReports: https://github.com/FOR-CAST/nrv-forsite-app/issues
 Suggests: 
     geodata,
     nrvtools (>= 0.0.21.9002),
     sf,
     terra,
     testthat (>= 3.0.0)
+Remotes:
+    FOR-CAST/nrvtools@development,
+    hrbrmstr/waffle
 Config/testthat/edition: 3
-Depends: 
-    R (>= 3.5)
+Encoding: UTF-8
+Language: en-CA
+LazyData: true
+LazyDataCompression: gzip
+RoxygenNote: 7.3.3
